@@ -57,6 +57,7 @@ export default function App() {
   const [selected, setSelected] = useState<Article | null>(null);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [favs, setFavs] = useState<Set<number>>(loadFavorites);
+  const [showQr, setShowQr] = useState(false);
   const [pageSize, setPageSize] = useState<number>(loadPageSize);
   const [shown, setShown] = useState<number>(pageSize);
 
@@ -130,6 +131,9 @@ export default function App() {
         <h1>{title[view]}</h1>
         <div className="topbar-actions">
           {view === 'home' && (
+            <button className="icon-btn qr-btn" aria-label="スマホ用QRコード" onClick={() => setShowQr(true)}>QR</button>
+          )}
+          {view === 'home' && (
             <button className="icon-btn" aria-label="設定" onClick={() => setView('settings')}>⚙️</button>
           )}
           {view !== 'home' && (
@@ -171,6 +175,17 @@ export default function App() {
       )}
 
       {view === 'logs' && <Logs data={data} />}
+
+      {showQr && (
+        <div className="modal" role="dialog" aria-modal="true" onClick={() => setShowQr(false)}>
+          <div className="modal-body" onClick={(e) => e.stopPropagation()}>
+            <button className="icon-btn modal-close" aria-label="閉じる" onClick={() => setShowQr(false)}>✕</button>
+            <h2>スマホで開く</h2>
+            <img src={`${import.meta.env.BASE_URL}qr.svg`} alt="スマホ版を開くQRコード" width={260} height={260} />
+            <p className="muted tiny">スマホのカメラで読み取ってください。<br />https://moppe1979.github.io/AITopics/</p>
+          </div>
+        </div>
+      )}
     </Shell>
   );
 }

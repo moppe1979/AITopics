@@ -1,0 +1,14 @@
+[
+  {"id": "openai-news", "name": "OpenAI News", "url": "https://openai.com/news/rss.xml", "type": "rss", "priority": 3, "enabled": true},
+  {"id": "claude-code-releases", "name": "Claude Code Releases (GitHub)", "url": "https://github.com/anthropics/claude-code/releases.atom", "type": "atom", "priority": 3, "enabled": true},
+  {"id": "google-ai-blog", "name": "Google AI Blog", "url": "https://blog.google/technology/ai/rss/", "type": "rss", "priority": 3, "enabled": true},
+  {"id": "huggingface-blog", "name": "Hugging Face Blog", "url": "https://huggingface.co/blog/feed.xml", "type": "rss", "priority": 2, "enabled": true},
+  {"id": "github-blog", "name": "GitHub Blog", "url": "https://github.blog/feed/", "type": "rss", "priority": 2, "enabled": true},
+  {"id": "azure-blog", "name": "Azure Blog", "url": "https://azure.microsoft.com/en-us/blog/feed/", "type": "rss", "priority": 2, "enabled": true},
+  {"id": "power-platform-blog", "name": "Power Platform Blog", "url": "https://www.microsoft.com/en-us/power-platform/blog/feed/", "type": "rss", "priority": 2, "enabled": true},
+  {"id": "itmedia-aiplus", "name": "ITmedia AI+", "url": "https://rss.itmedia.co.jp/rss/2.0/aiplus.xml", "type": "rss", "priority": 2, "enabled": true},
+  {"id": "itmedia-monoist", "name": "MONOist（製造業）", "url": "https://rss.itmedia.co.jp/rss/2.0/monoist.xml", "type": "rss", "priority": 2, "enabled": true},
+  {"id": "zenn-ai", "name": "Zenn: AI", "url": "https://zenn.dev/topics/ai/feed", "type": "rss", "priority": 1, "enabled": true},
+  {"id": "qiita-ai", "name": "Qiita: AI", "url": "https://qiita.com/tags/ai/feed", "type": "atom", "priority": 1, "enabled": true},
+  {"id": "jpcert", "name": "JPCERT/CC", "url": "https://www.jpcert.or.jp/rss/jpcert.rdf", "type": "rss", "priority": 2, "enabled": true}
+]

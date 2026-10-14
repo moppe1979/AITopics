@@ -1,0 +1,48 @@
+name: collect-and-deploy
+
+on:
+  schedule:
+    - cron: "0 21 * * *"   # UTC 21:00 = 日本時間 毎日 06:00（1日1回）
+  workflow_dispatch: {}     # Actions画面から手動実行（手動更新）
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Collect articles
+        run: python collector/collect.py
+        env:
+          TZ: Asia/Tokyo
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - name: Commit database
+        run: |
+          git config user.name "aitopics-bot"
+          git config user.email "aitopics-bot@users.noreply.github.com"
+          git add data/topics.db
+          git diff --cached --quiet || git commit -m "chore: update topics db"
+          git push
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build web
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+      - uses: actions/deploy-pages@v4

@@ -150,9 +150,14 @@ export default function App() {
             />
           <button className="icon-btn qr-btn" aria-label="スマホ用QRコード" onClick={() => setShowQr(true)}>QR</button>
           <button className="icon-btn" aria-label="設定" onClick={() => setView('settings')}>⚙️</button>
-          {view !== 'home' && view !== 'list' && (
-            <button className="icon-btn" aria-label="戻る" onClick={back}>✕</button>
-          )}
+          {/* ✕は常に枠を確保し、画面を切り替えても他のボタン位置がずれないようにする */}
+          <button
+            className={`icon-btn ${view === 'home' || view === 'list' ? 'ghost' : ''}`}
+            aria-label="戻る"
+            aria-hidden={view === 'home' || view === 'list'}
+            tabIndex={view === 'home' || view === 'list' ? -1 : 0}
+            onClick={back}
+          >✕</button>
         </div>
       </header>
 

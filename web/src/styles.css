@@ -112,3 +112,7 @@ code { background: var(--primary-weak); padding: 0 4px; border-radius: 4px; }
 .home-btn { min-width: 116px; text-align: center; }
 .app:not(.wide) > :not(.topbar):not(.modal) { max-width: 1100px; margin-left: auto; margin-right: auto; }
 .app { max-width: none; }
+.icon-btn.ghost { visibility: hidden; pointer-events: none; }
+html { overflow-y: scroll; }
+.topbar-actions { flex-wrap: nowrap; }
+.icon-btn { flex: 0 0 44px; }

@@ -269,8 +269,8 @@ function Summary({ a }: { a: Article }) {
   return (
     <>
       <p className="summary">{a.summary}</p>
-      {a.summaryKind === 'excerpt' && <p className="muted tiny">※配信元の概要の抜粋です（AI要約は未設定）。</p>}
-      {a.usagePoints && <p className="usage"><b>業務活用のポイント:</b> {a.usagePoints}</p>}
+      {a.summaryKind === 'excerpt' && <p className="muted tiny">※配信元の概要の抜粋です（AI要約は使用していません）。</p>}
+      {a.usagePoints && <p className="usage"><b>業務活用の着眼点（カテゴリからの目安）:</b><br />{a.usagePoints}</p>}
     </>
   );
 }
@@ -286,7 +286,8 @@ function Detail({ a, fav, toggleFav, related, openDetail }: {
       <h3>概要</h3>
       <Summary a={a} />
       <h3>業務活用の可能性</h3>
-      <p className="muted">{a.usagePoints ?? 'AI要約が未設定のため、活用ポイントは未生成です。'}</p>
+      <p className="usage">{a.usagePoints ?? '該当するカテゴリがないため、活用の着眼点はありません。'}</p>
+      {a.usagePoints && <p className="muted tiny">※記事内容の要約ではなく、カテゴリに基づく自動の目安です。実際の適用可否は元記事でご確認ください。</p>}
       <h3>関連キーワード</h3>
       <div className="chips small">{a.keywords.length ? a.keywords.map((k) => <span key={k} className="tag">{k}</span>) : <span className="muted">なし</span>}</div>
       <div className="card-actions">

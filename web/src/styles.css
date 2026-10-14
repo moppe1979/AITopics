@@ -33,7 +33,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 syst
 .card-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 .card-actions a { color: var(--primary); }
 .summary { margin: 8px 0 4px; overflow-wrap: anywhere; }
-.usage { background: var(--primary-weak); padding: 8px; border-radius: 8px; }
+.usage { white-space: pre-line; background: var(--primary-weak); padding: 8px; border-radius: 8px; }
 .muted { color: var(--muted); } .tiny { font-size: .78rem; margin: 2px 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chips.small { gap: 6px; margin: 4px 0; }

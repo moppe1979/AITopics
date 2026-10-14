@@ -9,7 +9,8 @@ AI・SI・製造業DXの最新情報をRSS等から毎日自動収集し、分�
 collector/   収集（Python 3.11 標準ライブラリのみ。追加インストール不要）
   sources.json  情報取得元（追加・無効化はここを編集）
   collect.py    取得 → SQLite保存 → web/public/data/articles.json 出力
-  classify.py   規則ベースのカテゴリ分類・重要度判定
+  classify.py   規則ベースのカテゴリ分類・重要度判定・活用ポイント付与
+  rules.json    分類キーワード・重要語・重要度しきい値・カテゴリ別の活用の着眼点
 data/topics.db  SQLite（articles / sources / categories / fetch_logs）
 web/         表示（React + TypeScript + Vite、スマホ対応の静的サイト）
 .github/workflows/collect.yml  定期実行 + GitHub Pages 配信
@@ -44,13 +45,13 @@ npm run build      # 本番ビルド（web/dist）
 | 項目 | 変更方法 |
 |---|---|
 | 情報取得元 | `collector/sources.json`（`enabled`, `priority`） |
-| カテゴリ・キーワード・重要度判定 | `collector/classify.py` |
+| カテゴリ・キーワード・重要度判定・活用の着眼点 | `collector/rules.json`（変更は次回実行時に既存記事へも反映） |
 | 取得頻度 | `collect.yml` の `cron`（GitHub Actions 側で管理。画面からは変更不可） |
 | 保持期間 | `collect.py` の `EXPORT_DAYS`（既定120日） |
 | 表示件数・お気に入り | 画面の設定（端末のブラウザ内に保存） |
 
 環境変数（`.env.example` 参照、`.env` は Git 管理外）:
-`ANTHROPIC_API_KEY`（任意・AI要約は未実装/第3段階）、`DB_PATH`。
+`DB_PATH`。AI要約は使用しないためAPIキーは不要です。
 GitHub では Secrets に登録し、コードには書かないでください。
 
 ## 仕様上のポイント
@@ -58,9 +59,10 @@ GitHub では Secrets に登録し、コードには書かないでください�
 - 記事URLは正規化（utmなど除去・フラグメント除去）し、`url_normalized` のUNIQUE制約で重複登録を防止。同一タイトルの転載は `duplicate_of` で検知し一覧から除外。
 - 取得失敗は `fetch_logs` と `sources.last_error` に記録し、次のソースの処理を継続。画面の取得履歴・警告バナーで確認可能。
 - 最終取得から48時間超で「情報が古い可能性」を表示。時刻は日本時間表示、公開日時と取得日時は別管理。
+- 分類・重要度・「活用の着眼点」は規則ベースの自動付与です（着眼点はカテゴリに基づく目安で、記事内容の要約ではありません）。
 - 概要はフィードの抜粋であり、AI要約ではありません（画面に明記）。取得できない場合は推測せず「取得できませんでした」と表示。
 - 取得元はRSS/Atomのみ。スクレイピングはしません。
 
 ## 未実装（今後の段階）
 
-AI（LLM）要約・業務活用ポイント生成（第3段階）、CSV出力・メール通知・ユーザー別設定（第4段階）。
+CSV出力・メール通知・ユーザー別設定（第4段階）。

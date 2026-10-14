@@ -1,22 +1,14 @@
-"""規則ベースの分類・重要度判定（APIキー不要）。記事内の文章は命令として扱わず、キーワード照合のみ行う。"""
+"""規則ベースの分類・重要度判定・活用ポイント付与（APIキー不要）。
+記事内の文章は命令として扱わず、キーワード照合のみ行う。基準は rules.json で管理する。"""
+import json
 import re
+from pathlib import Path
 
-CATEGORY_KEYWORDS = {
-    "AI": ["ai", "生成ai", "llm", "chatgpt", "openai", "claude", "anthropic", "gemini", "gpt", "rag",
-           "機械学習", "人工知能", "ocr", "音声認識", "画像認識", "copilot", "machine learning"],
-    "AIエージェント": ["エージェント", "agent", "agentic", "claude code", "自律", "mcp", "codex"],
-    "SI・システム開発": ["システム開発", "システム連携", "web api", "webアプリ", "業務アプリ", "インテグレーション",
-                  "api", "sdk", "typescript", "python", "github", "オープンソース", "open source", "dx", "devops"],
-    "クラウド・インフラ": ["クラウド", "cloud", "azure", "aws", "サーバー", "ネットワーク", "kubernetes", "docker", "microsoft 365", "インフラ"],
-    "データベース・データ連携": ["データベース", "database", "sql", "データ連携", "dataverse", "ベクトル", "vector", "postgres", "etl", "データ基盤"],
-    "ローコード・業務自動化": ["power apps", "power automate", "power bi", "power platform", "ローコード", "ノーコード",
-                     "low-code", "no-code", "rpa", "業務自動化", "sharepoint", "業務改善"],
-    "セキュリティ": ["セキュリティ", "security", "脆弱性", "vulnerability", "cve", "ランサム", "ransomware", "マルウェア", "不正アクセス", "サイバー"],
-    "製造業・IoT": ["製造", "工場", "スマートファクトリー", "iot", "センサー", "生産管理", "品質管理", "設備保全",
-                 "画像検査", "異常検知", "manufactur", "factory", "予知保全", "monoist"],
-}
-IMPORTANT_WORDS = ["発表", "リリース", "公開", "新機能", "料金", "価格", "脆弱性", "緊急", "重大",
-                   "launch", "release", "announce", "pricing", "critical", "vulnerability"]
+RULES = json.loads((Path(__file__).parent / "rules.json").read_text(encoding="utf-8"))
+CATEGORY_KEYWORDS = RULES["category_keywords"]
+IMPORTANT_WORDS = RULES["important_words"]
+THRESHOLDS = RULES["importance_thresholds"]
+USAGE_POINTS = RULES["usage_points"]
 
 _SHORT_ASCII = re.compile(r"^[a-z0-9 .\-]+$")
 
@@ -45,4 +37,10 @@ def importance(title: str, summary: str, categories: list[str], source_priority:
     score += min(2, sum(1 for w in IMPORTANT_WORDS if w in text))
     if "その他" not in categories:
         score += 1
-    return 3 if score >= 5 else 2 if score >= 3 else 1
+    return 3 if score >= THRESHOLDS["high"] else 2 if score >= THRESHOLDS["medium"] else 1
+
+
+def usage_points(categories: list[str]) -> str | None:
+    """カテゴリに基づく着眼点（記事内容の要約ではなく、規則による目安）。"""
+    texts = [USAGE_POINTS[c][0] for c in categories if c in USAGE_POINTS][:2]
+    return "\n".join(texts) or None

@@ -73,17 +73,29 @@ def store_item(con, src, it, run_at) -> bool:
     summary = it["summary"][:SUMMARY_MAX] + ("…" if len(it["summary"]) > SUMMARY_MAX else "")
     cats, kws = clf.classify(it["title"], it["summary"], src["name"])
     imp = clf.importance(it["title"], it["summary"], cats, src["priority"])
+    up = clf.usage_points(cats)
     tkey = dbm.title_key(it["title"])
     dup = con.execute("SELECT id FROM articles WHERE title_key=? AND duplicate_of IS NULL", (tkey,)).fetchone() if tkey else None
     pub = it["published"].isoformat(timespec="seconds") if it["published"] else None
     con.execute(
         """INSERT INTO articles(title,url,url_normalized,title_key,published_at,fetched_at,source_id,source_name,
-           summary,summary_kind,categories,keywords,importance,duplicate_of,created_at,updated_at)
-           VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+           summary,summary_kind,categories,keywords,importance,usage_points,duplicate_of,created_at,updated_at)
+           VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
         (it["title"], it["url"], norm, tkey, pub, run_at, src["id"], src["name"],
          summary or None, "excerpt" if summary else "none", json.dumps(cats, ensure_ascii=False),
-         json.dumps(kws, ensure_ascii=False), imp, dup["id"] if dup else None, run_at, run_at))
+         json.dumps(kws, ensure_ascii=False), imp, up, dup["id"] if dup else None, run_at, run_at))
     return True
+
+
+def reclassify(con) -> None:
+    """rules.json の変更を既存記事にも反映する。"""
+    prio = {r["id"]: r["priority"] for r in con.execute("SELECT id,priority FROM sources")}
+    for r in con.execute("SELECT id,title,summary,source_name,source_id FROM articles").fetchall():
+        cats, kws = clf.classify(r["title"], r["summary"] or "", r["source_name"] or "")
+        imp = clf.importance(r["title"], r["summary"] or "", cats, prio.get(r["source_id"], 1))
+        con.execute("UPDATE articles SET categories=?,keywords=?,importance=?,usage_points=? WHERE id=?",
+                    (json.dumps(cats, ensure_ascii=False), json.dumps(kws, ensure_ascii=False), imp, clf.usage_points(cats), r["id"]))
+    con.commit()
 
 
 def run_fetch(con, only=None) -> None:
@@ -157,6 +169,7 @@ def main() -> int:
     sync_sources(con)
     if not args.no_fetch:
         run_fetch(con, args.only)
+    reclassify(con)
     export_json(con, ROOT / "web" / "public" / "data" / "articles.json")
     return 0
 

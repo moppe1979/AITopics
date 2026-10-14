@@ -66,7 +66,20 @@ a.btn.primary { display: inline-block; width: auto; margin: 0; }
 code { background: var(--primary-weak); padding: 0 4px; border-radius: 4px; }
 @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
 .orig { overflow-wrap: anywhere; margin: 0 0 4px; }
-.app.wide { max-width: 1200px; }
+.app.wide { max-width: none; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 12px; align-items: start; }
+.card-grid .card { margin: 0; }
+.triple { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.triple > div { min-width: 0; }
+@media (max-width: 1000px) { .triple { grid-template-columns: 1fr; gap: 0; } }
+@media (min-width: 1000px) {
+  .app { padding-left: 32px; padding-right: 32px; }
+  .app:not(.wide) { max-width: 1100px; }
+  .app.wide .filters { grid-template-columns: 2fr 1fr 1fr 1.4fr 1fr 1fr; align-items: center; }
+  .app.wide .filters .row { display: contents; }
+  .app.wide .filters .check { grid-column: auto; }
+  .app.wide .filters .row label { display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+}
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
 .col { margin-top: 24px; min-width: 0; }
 .col-scroll { max-height: calc(100vh - 240px); min-height: 320px; overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; -webkit-overflow-scrolling: touch; }

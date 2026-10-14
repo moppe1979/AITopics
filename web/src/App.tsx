@@ -125,7 +125,7 @@ export default function App() {
   };
 
   return (
-    <Shell wide={view === 'home'}>
+    <Shell wide={view === 'home' || view === 'list'}>
       <header className="topbar">
         <h1>{title[view]}</h1>
         <div className="topbar-actions">
@@ -144,9 +144,11 @@ export default function App() {
         <>
           <FilterPanel data={data} filters={filters} setFilters={(f) => { setFilters(f); setShown(pageSize); }} />
           <p className="muted">{filtered.length} 件</p>
-          {filtered.slice(0, shown).map((a) => (
-            <Card key={a.id} a={a} fav={favs.has(a.id)} toggleFav={toggleFav} onOpen={() => openDetail(a)} />
-          ))}
+          <div className="card-grid">
+            {filtered.slice(0, shown).map((a) => (
+              <Card key={a.id} a={a} fav={favs.has(a.id)} toggleFav={toggleFav} onOpen={() => openDetail(a)} />
+            ))}
+          </div>
           {filtered.length === 0 && <p className="muted">条件に一致する記事はありません。</p>}
           {shown < filtered.length && (
             <button className="btn" onClick={() => setShown(shown + pageSize)}>さらに表示</button>
@@ -237,8 +239,13 @@ function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
         {section('重要なトピックス', important, () => openList({ minImportance: 3 }), true)}
         {section('最新トピックス', latest, () => openList(), true)}
       </div>
-      {groups.map(([h, cats]) =>
-        section(h, data.articles.filter((a) => a.categories.some((c) => cats.includes(c))).slice(0, 3), () => openList({ category: cats[0] })))}
+      <div className="triple">
+        {groups.map(([h, cats]) => (
+          <div key={h}>
+            {section(h, data.articles.filter((a) => a.categories.some((c) => cats.includes(c))).slice(0, 5), () => openList({ category: cats[0] }))}
+          </div>
+        ))}
+      </div>
     </>
   );
 }

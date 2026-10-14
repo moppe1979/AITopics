@@ -87,3 +87,9 @@ code { background: var(--primary-weak); padding: 0 4px; border-radius: 4px; }
   .cols { grid-template-columns: 1fr; gap: 0; }
   .col-scroll { max-height: 70vh; }
 }
+.homebar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 4px 0; }
+.homebar .btn { width: auto; margin: 0; padding: 0 20px; }
+.card h3 { font-size: 1.25rem; }
+.card-title { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.25rem; }
+.clamp3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card-left { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }

@@ -196,8 +196,6 @@ function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
   data: Dataset; openList: (p?: Partial<Filters>) => void; openDetail: (a: Article) => void;
   favs: Set<number>; toggleFav: (id: number) => void; openLogs: () => void;
 }) {
-  const today = jstDay(new Date().toISOString());
-  const todayCount = data.articles.filter((a) => jstDay(articleDate(a)) === today).length;
   const counts = data.categories.map((c) => [c, data.articles.filter((a) => a.categories.includes(c)).length] as const);
   const important = data.articles.filter((a) => a.importance === 3).slice(0, 50);
   const latest = data.articles.slice(0, 50);
@@ -206,7 +204,6 @@ function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
     ['SI関連ニュース', ['SI・システム開発', 'クラウド・インフラ', 'データベース・データ連携', 'ローコード・業務自動化']],
     ['製造業への活用事例', ['製造業・IoT']],
   ];
-  const okSources = data.sources.filter((s) => s.status === 'ok').length;
   const section = (heading: string, items: Article[], more?: () => void, scroll = false) => (
     <section className={scroll ? 'section col' : 'section'}>
       <div className="section-head"><h2>{heading}</h2>{more && <button className="link" onClick={more}>もっと見る</button>}</div>
@@ -219,13 +216,11 @@ function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
   return (
     <>
       <StatusBanner data={data} />
-      <div className="stats">
-        <div className="stat"><b>{todayCount}</b><span>本日の記事</span></div>
-        <div className="stat"><b>{data.articles.length}</b><span>保持記事</span></div>
-        <button className="stat" onClick={openLogs}><b>{okSources}/{data.sources.filter((s) => s.enabled).length}</b><span>取得成功ソース</span></button>
+      <div className="homebar">
+        <button className="btn primary" onClick={() => openList()}>記事一覧・検索</button>
+        <span className="muted">最終取得: {fmt(data.lastRunAt)}（日本時間）</span>
+        <button className="link" onClick={openLogs}>取得履歴</button>
       </div>
-      <p className="muted">最終取得: {fmt(data.lastRunAt)}（日本時間）</p>
-      <button className="btn primary" onClick={() => openList()}>記事一覧・検索</button>
 
       <section className="section">
         <h2>カテゴリ別件数</h2>
@@ -254,7 +249,7 @@ function Stars({ n }: { n: number }) {
   return <span className={`imp imp-${n}`}>重要度 {IMPORTANCE_LABEL[n]}</span>;
 }
 
-function Card({ a, fav, toggleFav, onOpen, compact }: {
+function Card({ a, fav, toggleFav, onOpen }: {
   a: Article; fav: boolean; toggleFav: (id: number) => void; onOpen: () => void; compact?: boolean;
 }) {
   return (
@@ -264,12 +259,14 @@ function Card({ a, fav, toggleFav, onOpen, compact }: {
       </div>
       <h3><button className="card-title" onClick={onOpen}>{a.titleJa ?? a.title}</button></h3>
       {a.titleJa && <p className="muted tiny orig">原題: {a.title}</p>}
-      <div className="chips small">{a.categories.map((c) => <span key={c} className="tag">{c}</span>)}</div>
-      {!compact && <Summary a={a} />}
+      {a.summary ? <p className="summary clamp3">{a.summary}</p> : <p className="muted tiny">概要を取得できませんでした。</p>}
       <div className="card-actions">
-        <button className={`fav ${fav ? 'on' : ''}`} onClick={() => toggleFav(a.id)} aria-pressed={fav}>
-          {fav ? '★ お気に入り' : '☆ お気に入り'}
-        </button>
+        <div className="card-left">
+          <button className={`fav ${fav ? 'on' : ''}`} onClick={() => toggleFav(a.id)} aria-pressed={fav}>
+            {fav ? '★ お気に入り' : '☆ お気に入り'}
+          </button>
+          {a.categories.map((c) => <span key={c} className="tag">{c}</span>)}
+        </div>
         <a href={a.url} target="_blank" rel="noopener noreferrer">元記事を開く ↗</a>
       </div>
     </article>

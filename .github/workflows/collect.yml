@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: "0 21 * * *"   # UTC 21:00 = 日本時間 毎日 06:00（1日1回）
   workflow_dispatch: {}     # Actions画面から手動実行（手動更新）
+  push:                     # 画面(web/)・収集ロジック変更時に自動で再公開
+    branches: [main]
+    paths: ["web/**", "collector/**", ".github/workflows/collect.yml"]
 
 permissions:
   contents: write

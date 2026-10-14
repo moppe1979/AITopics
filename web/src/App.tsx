@@ -124,14 +124,16 @@ export default function App() {
   if (!data) return <Shell><p className="muted">読み込み中…</p></Shell>;
 
   const title: Record<View, string> = {
-    home: 'AI・SIトピックス', list: '記事一覧', detail: '記事詳細', settings: '設定', logs: '取得履歴',
+    home: 'トピックス', list: '記事一覧', detail: '記事詳細', settings: '設定', logs: '取得履歴',
   };
 
   return (
     <Shell wide={view === 'home' || view === 'list'}>
       <header className="topbar">
         <div className="topbar-left">
-          {view !== 'home' && (
+          {view === 'home' ? (
+            <button className="home-btn" aria-label="記事一覧を開く" onClick={() => openList()}>記事一覧</button>
+          ) : (
             <button className="home-btn" aria-label="トピックスのページに戻る" onClick={() => setView('home')}>← トピックス</button>
           )}
           <h1>{title[view]}</h1>
@@ -244,7 +246,6 @@ function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
     <>
       <StatusBanner data={data} />
       <div className="homebar">
-        <button className="btn primary" onClick={() => openList()}>記事一覧・検索</button>
         <span className="muted">最終取得: {fmt(data.lastRunAt)}（日本時間）</span>
         <button className="link" onClick={openLogs}>取得履歴</button>
       </div>

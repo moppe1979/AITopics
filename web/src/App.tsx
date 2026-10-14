@@ -125,7 +125,7 @@ export default function App() {
   };
 
   return (
-    <Shell>
+    <Shell wide={view === 'home'}>
       <header className="topbar">
         <h1>{title[view]}</h1>
         <div className="topbar-actions">
@@ -173,8 +173,8 @@ export default function App() {
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
-  return <div className="app">{children}</div>;
+function Shell({ children, wide }: { children: React.ReactNode; wide?: boolean }) {
+  return <div className={wide ? 'app wide' : 'app'}>{children}</div>;
 }
 
 function StatusBanner({ data }: { data: Dataset }) {
@@ -197,18 +197,21 @@ function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
   const today = jstDay(new Date().toISOString());
   const todayCount = data.articles.filter((a) => jstDay(articleDate(a)) === today).length;
   const counts = data.categories.map((c) => [c, data.articles.filter((a) => a.categories.includes(c)).length] as const);
-  const important = data.articles.filter((a) => a.importance === 3).slice(0, 5);
+  const important = data.articles.filter((a) => a.importance === 3).slice(0, 50);
+  const latest = data.articles.slice(0, 50);
   const groups: [string, string[]][] = [
     ['AI関連ニュース', ['AI', 'AIエージェント']],
     ['SI関連ニュース', ['SI・システム開発', 'クラウド・インフラ', 'データベース・データ連携', 'ローコード・業務自動化']],
     ['製造業への活用事例', ['製造業・IoT']],
   ];
   const okSources = data.sources.filter((s) => s.status === 'ok').length;
-  const section = (heading: string, items: Article[], more?: () => void) => (
-    <section className="section">
+  const section = (heading: string, items: Article[], more?: () => void, scroll = false) => (
+    <section className={scroll ? 'section col' : 'section'}>
       <div className="section-head"><h2>{heading}</h2>{more && <button className="link" onClick={more}>もっと見る</button>}</div>
-      {items.length === 0 && <p className="muted">該当する記事はまだありません。</p>}
-      {items.map((a) => <Card key={a.id} a={a} compact fav={favs.has(a.id)} toggleFav={toggleFav} onOpen={() => openDetail(a)} />)}
+      <div className={scroll ? 'col-scroll' : undefined}>
+        {items.length === 0 && <p className="muted">該当する記事はまだありません。</p>}
+        {items.map((a) => <Card key={a.id} a={a} compact fav={favs.has(a.id)} toggleFav={toggleFav} onOpen={() => openDetail(a)} />)}
+      </div>
     </section>
   );
   return (
@@ -230,8 +233,10 @@ function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
           ))}
         </div>
       </section>
-      {section('重要なトピックス', important, () => openList({ minImportance: 3 }))}
-      {section('最新トピックス', data.articles.slice(0, 5), () => openList())}
+      <div className="cols">
+        {section('重要なトピックス', important, () => openList({ minImportance: 3 }), true)}
+        {section('最新トピックス', latest, () => openList(), true)}
+      </div>
       {groups.map(([h, cats]) =>
         section(h, data.articles.filter((a) => a.categories.some((c) => cats.includes(c))).slice(0, 3), () => openList({ category: cats[0] })))}
     </>

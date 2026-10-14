@@ -139,24 +139,18 @@ export default function App() {
           <h1>{title[view]}</h1>
         </div>
         <div className="topbar-actions">
-          {(view === 'home' || view === 'list') && (
-            <input
+          <input
               className="top-search"
               type="search"
               placeholder="キーワード検索"
               aria-label="キーワード検索"
               value={filters.q}
               onChange={(e) => { setFilters({ ...filters, q: e.target.value }); setShown(pageSize); }}
-              onKeyDown={(e) => { if (e.key === 'Enter' && view === 'home') setView('list'); }}
+              onKeyDown={(e) => { if (e.key === 'Enter' && view !== 'list') setView('list'); }}
             />
-          )}
-          {(view === 'home' || view === 'list') && (
-            <button className="icon-btn qr-btn" aria-label="スマホ用QRコード" onClick={() => setShowQr(true)}>QR</button>
-          )}
-          {view === 'home' && (
-            <button className="icon-btn" aria-label="設定" onClick={() => setView('settings')}>⚙️</button>
-          )}
-          {view !== 'home' && (
+          <button className="icon-btn qr-btn" aria-label="スマホ用QRコード" onClick={() => setShowQr(true)}>QR</button>
+          <button className="icon-btn" aria-label="設定" onClick={() => setView('settings')}>⚙️</button>
+          {view !== 'home' && view !== 'list' && (
             <button className="icon-btn" aria-label="戻る" onClick={back}>✕</button>
           )}
         </div>

@@ -27,6 +27,10 @@ def connect(path: str) -> sqlite3.Connection:
     con = sqlite3.connect(path)
     con.row_factory = sqlite3.Row
     con.executescript(SCHEMA)
+    try:  # 既存DBへの列追加（タイトル日本語訳）
+        con.execute("ALTER TABLE articles ADD COLUMN title_ja TEXT")
+    except sqlite3.OperationalError:
+        pass
     return con
 
 

@@ -1,6 +1,7 @@
 export interface Article {
   id: number;
   title: string;
+  titleJa: string | null;
   url: string;
   publishedAt: string | null;
   fetchedAt: string;

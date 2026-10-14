@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import classify as clf  # noqa: E402
 import db as dbm  # noqa: E402
 import feed  # noqa: E402
+import translate  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 JST = timezone(timedelta(hours=9))
@@ -141,7 +142,7 @@ def export_json(con, out: Path) -> None:
             "fetchedAt": r["fetched_at"], "sourceId": r["source_id"], "source": r["source_name"],
             "summary": r["summary"], "summaryKind": r["summary_kind"],
             "categories": json.loads(r["categories"] or "[]"), "keywords": json.loads(r["keywords"] or "[]"),
-            "importance": r["importance"], "usagePoints": r["usage_points"]})
+            "titleJa": r["title_ja"], "importance": r["importance"], "usagePoints": r["usage_points"]})
     sources = [dict(id=r["id"], name=r["name"], url=r["url"], enabled=bool(r["enabled"]),
                     lastFetchedAt=r["last_fetched_at"], status=r["last_status"], error=r["last_error"])
                for r in con.execute("SELECT * FROM sources ORDER BY priority DESC, name")]
@@ -170,6 +171,8 @@ def main() -> int:
     if not args.no_fetch:
         run_fetch(con, args.only)
     reclassify(con)
+    if not args.no_fetch:
+        translate.translate_missing(con)
     export_json(con, ROOT / "web" / "public" / "data" / "articles.json")
     return 0
 

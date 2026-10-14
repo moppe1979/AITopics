@@ -65,3 +65,4 @@ a.btn.primary { display: inline-block; width: auto; margin: 0; }
 .detail h3 { margin: 18px 0 4px; font-size: 1rem; }
 code { background: var(--primary-weak); padding: 0 4px; border-radius: 4px; }
 @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
+.orig { overflow-wrap: anywhere; margin: 0 0 4px; }

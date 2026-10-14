@@ -93,7 +93,7 @@ export default function App() {
       if (filters.from && day < filters.from) return false;
       if (filters.to && day > filters.to) return false;
       if (kw) {
-        const hay = `${a.title} ${a.summary ?? ''} ${a.source} ${a.keywords.join(' ')}`.toLowerCase();
+        const hay = `${a.titleJa ?? ''} ${a.title} ${a.summary ?? ''} ${a.source} ${a.keywords.join(' ')}`.toLowerCase();
         if (!kw.split(/\s+/).every((w) => hay.includes(w))) return false;
       }
       return true;
@@ -250,7 +250,8 @@ function Card({ a, fav, toggleFav, onOpen, compact }: {
       <div className="card-meta">
         <span>{fmt(a.publishedAt, false)}</span><span>{a.source}</span><Stars n={a.importance} />
       </div>
-      <h3><button className="card-title" onClick={onOpen}>{a.title}</button></h3>
+      <h3><button className="card-title" onClick={onOpen}>{a.titleJa ?? a.title}</button></h3>
+      {a.titleJa && <p className="muted tiny orig">原題: {a.title}</p>}
       <div className="chips small">{a.categories.map((c) => <span key={c} className="tag">{c}</span>)}</div>
       {!compact && <Summary a={a} />}
       <div className="card-actions">
@@ -280,7 +281,8 @@ function Detail({ a, fav, toggleFav, related, openDetail }: {
 }) {
   return (
     <article className="detail">
-      <h2>{a.title}</h2>
+      <h2>{a.titleJa ?? a.title}</h2>
+      {a.titleJa && <p className="muted tiny orig">原題: {a.title}（日本語タイトルは機械翻訳です）</p>}
       <p className="muted">公開日: {fmt(a.publishedAt)} ／ 取得日: {fmt(a.fetchedAt)} ／ 発信元: {a.source}</p>
       <div className="chips small"><Stars n={a.importance} />{a.categories.map((c) => <span key={c} className="tag">{c}</span>)}</div>
       <h3>概要</h3>
@@ -297,7 +299,7 @@ function Detail({ a, fav, toggleFav, related, openDetail }: {
       {related.length > 0 && (
         <>
           <h3>関連記事</h3>
-          {related.map((r) => <button key={r.id} className="link block" onClick={() => openDetail(r)}>{r.title}</button>)}
+          {related.map((r) => <button key={r.id} className="link block" onClick={() => openDetail(r)}>{r.titleJa ?? r.title}</button>)}
         </>
       )}
     </article>

@@ -106,3 +106,7 @@ code { background: var(--primary-weak); padding: 0 4px; border-radius: 4px; }
 .chip.kw.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 .chip.kw.active b { color: #fff; }
 .kw-chips { grid-column: 1 / -1; }
+.topbar { flex-wrap: wrap; gap: 8px; }
+.topbar-actions { flex: 1 1 auto; justify-content: flex-end; min-width: 0; }
+.top-search { flex: 1 1 160px; max-width: 420px; min-width: 0; min-height: 44px; font: inherit; padding: 0 12px; border-radius: 22px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+@media (max-width: 700px) { .topbar-actions { flex-basis: 100%; } .top-search { max-width: none; } }

@@ -137,7 +137,18 @@ export default function App() {
           <h1>{title[view]}</h1>
         </div>
         <div className="topbar-actions">
-          {view === 'home' && (
+          {(view === 'home' || view === 'list') && (
+            <input
+              className="top-search"
+              type="search"
+              placeholder="キーワード検索"
+              aria-label="キーワード検索"
+              value={filters.q}
+              onChange={(e) => { setFilters({ ...filters, q: e.target.value }); setShown(pageSize); }}
+              onKeyDown={(e) => { if (e.key === 'Enter' && view === 'home') setView('list'); }}
+            />
+          )}
+          {(view === 'home' || view === 'list') && (
             <button className="icon-btn qr-btn" aria-label="スマホ用QRコード" onClick={() => setShowQr(true)}>QR</button>
           )}
           {view === 'home' && (
@@ -214,31 +225,12 @@ function StatusBanner({ data }: { data: Dataset }) {
   );
 }
 
-function KeywordChips({ data, onPick, active }: { data: Dataset; onPick: (k: string) => void; active?: string }) {
-  const counts = new Map<string, number>();
-  data.articles.forEach((a) => a.keywords.forEach((k) => counts.set(k, (counts.get(k) ?? 0) + 1)));
-  const top = [...counts.entries()].sort((x, y) => y[1] - x[1]).slice(0, 16);
-  return (
-    <div className="chips small kw-chips">
-      {top.map(([k, n]) => (
-        <button key={k} className={`chip kw ${active === k ? 'active' : ''}`} onClick={() => onPick(k)}>{k} <b>{n}</b></button>
-      ))}
-    </div>
-  );
-}
-
 function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
   data: Dataset; openList: (p?: Partial<Filters>) => void; openDetail: (a: Article) => void;
   favs: Set<number>; toggleFav: (id: number) => void; openLogs: () => void;
 }) {
-  const counts = data.categories.map((c) => [c, data.articles.filter((a) => a.categories.includes(c)).length] as const);
   const important = data.articles.filter((a) => a.importance === 3).slice(0, 50);
   const latest = data.articles.slice(0, 50);
-  const groups: [string, string[]][] = [
-    ['AI関連ニュース', ['AI', 'AIエージェント']],
-    ['SI関連ニュース', ['SI・システム開発', 'クラウド・インフラ', 'データベース・データ連携', 'ローコード・業務自動化']],
-    ['製造業への活用事例', ['製造業・IoT']],
-  ];
   const section = (heading: string, items: Article[], more?: () => void, scroll = false) => (
     <section className={scroll ? 'section col' : 'section'}>
       <div className="section-head"><h2>{heading}</h2>{more && <button className="link" onClick={more}>もっと見る</button>}</div>
@@ -257,28 +249,9 @@ function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
         <button className="link" onClick={openLogs}>取得履歴</button>
       </div>
 
-      <section className="section">
-        <h2>カテゴリ別件数</h2>
-        <div className="chips">
-          {counts.map(([c, n]) => (
-            <button key={c} className="chip" onClick={() => openList({ category: c })}>{c} <b>{n}</b></button>
-          ))}
-        </div>
-      </section>
-      <section className="section">
-        <h2>検索キーワード</h2>
-        <KeywordChips data={data} onPick={(k) => openList({ q: k })} />
-      </section>
       <div className="cols">
         {section('重要なトピックス', important, () => openList({ minImportance: 3 }), true)}
         {section('最新トピックス', latest, () => openList(), true)}
-      </div>
-      <div className="triple">
-        {groups.map(([h, cats]) => (
-          <div key={h}>
-            {section(h, data.articles.filter((a) => a.categories.some((c) => cats.includes(c))).slice(0, 5), () => openList({ category: cats[0] }))}
-          </div>
-        ))}
       </div>
     </>
   );
@@ -358,8 +331,6 @@ function FilterPanel({ data, filters, setFilters }: { data: Dataset; filters: Fi
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => setFilters({ ...filters, [k]: v });
   return (
     <section className="filters">
-      <input type="search" placeholder="キーワード検索（スペースでAND）" value={filters.q} onChange={(e) => set('q', e.target.value)} />
-      <KeywordChips data={data} active={filters.q} onPick={(k) => set('q', filters.q === k ? '' : k)} />
       <div className="row">
         <select value={filters.category} onChange={(e) => set('category', e.target.value)} aria-label="カテゴリ">
           <option value="">全カテゴリ</option>

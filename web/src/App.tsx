@@ -58,6 +58,7 @@ export default function App() {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [favs, setFavs] = useState<Set<number>>(loadFavorites);
   const [showQr, setShowQr] = useState(false);
+  const [cameFrom, setCameFrom] = useState<View>('list');
   const [pageSize, setPageSize] = useState<number>(loadPageSize);
   const [shown, setShown] = useState<number>(pageSize);
 
@@ -112,11 +113,12 @@ export default function App() {
     setView('list');
   };
   const openDetail = (a: Article) => {
+    if (view !== 'detail') setCameFrom(view);
     setSelected(a);
     setView('detail');
     window.scrollTo(0, 0);
   };
-  const back = () => setView(view === 'detail' ? 'list' : 'home');
+  const back = () => setView(view === 'detail' ? cameFrom : 'home');
 
   if (error) return <Shell><p className="banner error">{error}</p></Shell>;
   if (!data) return <Shell><p className="muted">読み込み中…</p></Shell>;
@@ -128,7 +130,12 @@ export default function App() {
   return (
     <Shell wide={view === 'home' || view === 'list'}>
       <header className="topbar">
-        <h1>{title[view]}</h1>
+        <div className="topbar-left">
+          {view !== 'home' && (
+            <button className="home-btn" aria-label="トピックスのページに戻る" onClick={() => setView('home')}>← トピックス</button>
+          )}
+          <h1>{title[view]}</h1>
+        </div>
         <div className="topbar-actions">
           {view === 'home' && (
             <button className="icon-btn qr-btn" aria-label="スマホ用QRコード" onClick={() => setShowQr(true)}>QR</button>
@@ -207,6 +214,19 @@ function StatusBanner({ data }: { data: Dataset }) {
   );
 }
 
+function KeywordChips({ data, onPick, active }: { data: Dataset; onPick: (k: string) => void; active?: string }) {
+  const counts = new Map<string, number>();
+  data.articles.forEach((a) => a.keywords.forEach((k) => counts.set(k, (counts.get(k) ?? 0) + 1)));
+  const top = [...counts.entries()].sort((x, y) => y[1] - x[1]).slice(0, 16);
+  return (
+    <div className="chips small kw-chips">
+      {top.map(([k, n]) => (
+        <button key={k} className={`chip kw ${active === k ? 'active' : ''}`} onClick={() => onPick(k)}>{k} <b>{n}</b></button>
+      ))}
+    </div>
+  );
+}
+
 function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
   data: Dataset; openList: (p?: Partial<Filters>) => void; openDetail: (a: Article) => void;
   favs: Set<number>; toggleFav: (id: number) => void; openLogs: () => void;
@@ -244,6 +264,10 @@ function Home({ data, openList, openDetail, favs, toggleFav, openLogs }: {
             <button key={c} className="chip" onClick={() => openList({ category: c })}>{c} <b>{n}</b></button>
           ))}
         </div>
+      </section>
+      <section className="section">
+        <h2>検索キーワード</h2>
+        <KeywordChips data={data} onPick={(k) => openList({ q: k })} />
       </section>
       <div className="cols">
         {section('重要なトピックス', important, () => openList({ minImportance: 3 }), true)}
@@ -335,6 +359,7 @@ function FilterPanel({ data, filters, setFilters }: { data: Dataset; filters: Fi
   return (
     <section className="filters">
       <input type="search" placeholder="キーワード検索（スペースでAND）" value={filters.q} onChange={(e) => set('q', e.target.value)} />
+      <KeywordChips data={data} active={filters.q} onPick={(k) => set('q', filters.q === k ? '' : k)} />
       <div className="row">
         <select value={filters.category} onChange={(e) => set('category', e.target.value)} aria-label="カテゴリ">
           <option value="">全カテゴリ</option>

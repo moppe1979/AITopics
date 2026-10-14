@@ -100,3 +100,9 @@ code { background: var(--primary-weak); padding: 0 4px; border-radius: 4px; }
 .modal-body img { background: #fff; padding: 8px; border-radius: 8px; max-width: 100%; height: auto; }
 .modal-body h2 { margin: 0 0 12px; font-size: 1.1rem; }
 .modal-close { position: absolute; top: 8px; right: 8px; }
+.topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.home-btn { min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--primary); background: var(--surface); color: var(--primary); font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.chip.kw { min-height: 36px; padding: 0 10px; font-size: .9rem; }
+.chip.kw.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.chip.kw.active b { color: #fff; }
+.kw-chips { grid-column: 1 / -1; }

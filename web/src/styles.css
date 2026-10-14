@@ -67,11 +67,11 @@ code { background: var(--primary-weak); padding: 0 4px; border-radius: 4px; }
 @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
 .orig { overflow-wrap: anywhere; margin: 0 0 4px; }
 .app.wide { max-width: none; }
-.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 12px; align-items: start; }
+.card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
 .card-grid .card { margin: 0; }
-.triple { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.triple { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
 .triple > div { min-width: 0; }
-@media (max-width: 1000px) { .triple { grid-template-columns: 1fr; gap: 0; } }
+@media (max-width: 700px) { .triple, .card-grid { grid-template-columns: 1fr; gap: 0; } .card-grid .card { margin: 10px 0; } }
 @media (min-width: 1000px) {
   .app { padding-left: 32px; padding-right: 32px; }
   .app:not(.wide) { max-width: 1100px; }
